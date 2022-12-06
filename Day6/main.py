@@ -53,41 +53,27 @@ def main():
     """
     with open('routine.txt', 'r') as signal:
         signal = signal.readline()
-        marker_start = get_marker_start(signal)
-        message_start = get_message_start(signal)
+        marker_start = get_unique_characters_start(signal, length_of_characters=4)
+        message_start = get_unique_characters_start(signal, length_of_characters=14)
 
     print(f'The first marker is after character {marker_start}')
     print(f'The first message is after character {message_start}')
 
 
-def get_marker_start(signal):
+def get_unique_characters_start(signal, length_of_characters):
     start_slice = 0
-    end_slice = 4
+    end_slice = length_of_characters
     while True:
         marker = set(signal[start_slice:end_slice])
-        if len(marker) == 4:
+        if len(marker) == length_of_characters:
             break
         elif not marker:
-            raise Exception('Parsed the whole string and found no markers')
+            raise Exception(f'Parsed the whole string and found no unique string with size {end_slice}')
         else:
             start_slice += 1
             end_slice += 1
     return end_slice
 
-
-def get_message_start(signal):
-    start_slice = 0
-    end_slice = 14
-    while True:
-        marker = set(signal[start_slice:end_slice])
-        if len(marker) == 14:
-            break
-        elif not marker:
-            raise Exception('Parsed the whole string and found no message')
-        else:
-            start_slice += 1
-            end_slice += 1
-    return end_slice
 
 if __name__ == "__main__":
     main()
