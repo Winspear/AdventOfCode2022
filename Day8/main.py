@@ -37,6 +37,7 @@ def main():
     visible_trees = []
     forest_matrix_transposed = []
     visible_trees_transposed = []
+    visible_count = 0
     with open('trees_test.txt', 'r') as tree_file:
         for line_of_trees in tree_file.readlines():
             tree_row = [int(tree) for tree in line_of_trees.strip()]
@@ -47,11 +48,13 @@ def main():
         transpose_matrix(forest_matrix, forest_matrix_transposed)
         transpose_matrix(visible_trees, visible_trees_transposed)
         visible_from_left(forest_matrix_transposed, visible_trees_transposed)
-        visible_from_bottom(forest_matrix_transposed, visible_trees_transposed)
-        print(visible_trees_transposed)
+        visible_from_right(forest_matrix_transposed, visible_trees_transposed)
 
-        # print(visible_trees_transposed)
-
+        for row in visible_trees_transposed:
+            for item in row:
+                if item == 'y':
+                    visible_count += 1
+        print(visible_count)
 
 
 def initialise_other_matrices(forest_matrix, visible_trees, forest_matrix_transposed, visible_trees_transposed):
@@ -82,6 +85,8 @@ def visible_from_left(forest_matrix, visible_trees):
             elif forest_matrix[row_index][item_index] > previous_tree:
                 visible_trees[row_index][item_index] = 'y'
                 previous_tree = forest_matrix[row_index][item_index]
+            elif forest_matrix[row_index][item_index] == previous_tree:
+                continue
             else:
                 break
 
@@ -95,27 +100,10 @@ def visible_from_right(forest_matrix, visible_trees):
             elif forest_matrix[row_index][item_index] > previous_tree:
                 visible_trees[row_index][item_index] = 'y'
                 previous_tree = forest_matrix[row_index][item_index]
+            elif forest_matrix[row_index][item_index] == previous_tree:
+                continue
             else:
                 break
-
-def visible_from_bottom(forest_matrix, visible_trees):
-    print(forest_matrix)
-    print(visible_trees)
-    for row_index in range(len(forest_matrix)):
-        previous_tree = None
-        print('starting new row - ', forest_matrix[row_index])
-        for item_index in reversed(range(len(visible_trees[0]))):
-            print(forest_matrix[row_index][item_index], "This is matrix item")
-            print(previous_tree, " This is previous tree")
-            if previous_tree == None:
-                visible_trees[row_index][item_index] = 'y'
-                previous_tree = forest_matrix[row_index][item_index]
-            elif forest_matrix[row_index][item_index] > previous_tree:
-                visible_trees[row_index][item_index] = 'y'
-                previous_tree = forest_matrix[row_index][item_index]
-            else:
-                break
-
 
 def transpose_matrix(matrix, transposed_matrix):
     for i in range(len(matrix)):
