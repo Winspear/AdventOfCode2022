@@ -71,8 +71,12 @@ def main():
 
     Consider each tree on your map. What is the highest scenic score possible for any tree?
 
-        """
+    """
 
+
+
+    # The following is possibly some of the worst code I have ever written, but I am a few days behind and
+    # don't want to spend the time refactoring it yet. Reader beware.
     forest_matrix = []
     visible_trees = []
     forest_matrix_transposed = []
@@ -80,7 +84,7 @@ def main():
     viewing_distances = []
     viewing_distances_transposed = []
     visible_count = 0
-    with open('trees_test.txt', 'r') as tree_file:
+    with open('trees.txt', 'r') as tree_file:
         for line_of_trees in tree_file.readlines():
             tree_row = [int(tree) for tree in line_of_trees.strip()]
             forest_matrix.append(tree_row)
@@ -101,8 +105,9 @@ def main():
             for item in row:
                 if item == 'y':
                     visible_count += 1
+        max_from_each_row = map(max, viewing_distances_transposed)
+        print(max(list(max_from_each_row)))
         print(visible_count)
-        print(viewing_distances)
 
 
 def initialise_other_matrices(forest_matrix, visible_trees, forest_matrix_transposed, visible_trees_transposed, viewing_distances, viewing_distances_transposed):
@@ -147,20 +152,35 @@ def get_visible_trees(forest_matrix, visible_trees, is_reversed=False):
                 continue
 
 def get_viewing_distances(forest_matrix, viewing_distances, is_reversed=False):
-    if not is_reversed:
-        iterator = range(len(viewing_distances[0]))
-    else:
-        iterator = list(reversed(range(len(viewing_distances[0]))))
-    for row_index in range(len(forest_matrix[0])):
-        previous_tree = None
-        for column_index in iterator:
-            if previous_tree == None:
-                viewing_distances[row_index][column_index] *= 0
-                previous_tree = forest_matrix[row_index][column_index]
-            elif forest_matrix[row_index][column_index] > previous_tree:
-                viewing_distances[row_index][column_index] *= how_many_trees_before_next_blocker(forest_matrix, row_index, column_index, is_reversed)
-            elif forest_matrix[row_index][column_index] <= previous_tree:
-                continue
+    for row_index in range(len(forest_matrix)):
+        next_tree = None
+        if not is_reversed:
+            for column_index in range(len(viewing_distances[0])):
+                next_index = column_index + 1
+                if next_index > len(viewing_distances[0]) - 1:
+                    continue
+                current_tree = forest_matrix[row_index][column_index]
+                next_tree = forest_matrix[row_index][next_index]
+                if column_index == 0:
+                    viewing_distances[row_index][column_index] *= 0
+                if current_tree > next_tree:
+                    viewing_distances[row_index][column_index] *= how_many_trees_before_next_blocker(forest_matrix, row_index, column_index, is_reversed)
+                elif current_tree <= next_tree:
+                    continue
+        else:
+            iterator = list(reversed(range(len(viewing_distances[0]))))
+            for column_index in iterator:
+                next_index = column_index - 1
+                if next_index < 0:
+                    continue
+                current_tree = forest_matrix[row_index][column_index]
+                next_tree = forest_matrix[row_index][next_index]
+                if column_index == len(viewing_distances[0]) - 1:
+                    viewing_distances[row_index][column_index] *= 0
+                if current_tree > next_tree:
+                    viewing_distances[row_index][column_index] *= how_many_trees_before_next_blocker(forest_matrix, row_index, column_index, is_reversed)
+                elif current_tree <= next_tree:
+                    continue
 
 
 def how_many_trees_before_next_blocker(forest_matrix, row_index, column_index, is_reversed):
@@ -174,7 +194,7 @@ def how_many_trees_before_next_blocker(forest_matrix, row_index, column_index, i
                 if column_index - multiplier >= 0:
                     next_tree = forest_matrix[row_index][column_index - multiplier]
                 else:
-                    return multiplier
+                    return multiplier - 1
             if start_tree > next_tree:
                 multiplier += 1
             else:
