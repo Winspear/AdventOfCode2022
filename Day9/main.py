@@ -249,7 +249,7 @@ Simulate your complete hypothetical series of motions. How many positions does t
 """
     tail_positions = set()
     tail_positions.add(tuple({0:0}.items()))
-    with open('ropes_test.txt', 'r') as text:
+    with open('Ropes.txt', 'r') as text:
         head_position = {0:0}
         tail_position = {0:0}
         for line in text.readlines():
@@ -260,7 +260,6 @@ Simulate your complete hypothetical series of motions. How many positions does t
                 tail_position = move_tail(old_head_position, head_position, tail_position)
                 tail_positions.add(tuple(tail_position.items()))
         print('There are this many tail positions: ',  len(tail_positions))
-        print(tail_positions)
 
 
 def move_head(direction, head_position):
@@ -301,7 +300,7 @@ def move_tail(old_head_position, head_position, tail_position):
         pass
     elif head_y - tail_y >= 2:
         return old_head_position
-    elif head_x - tail_x <= -2:
+    elif head_y - tail_y <= -2:
         return old_head_position
     return tail_position
 
